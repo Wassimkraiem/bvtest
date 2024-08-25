@@ -5,6 +5,7 @@ services:
       command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
       image: "amazon/dynamodb-local:latest"
       container_name: dynamodb-local
+      restart: unless-stopped
       ports:
         - "8000:8000"
       volumes:
@@ -19,16 +20,16 @@ services:
       FLASK_ENV: development
       AWS_ACCESS_KEY_ID: dummyKey
       AWS_SECRET_ACCESS_KEY: dummySecret
+      FLASK_APP: sev.app.py
+      FLASK_DEBUG: 1
     volumes:
-      - /home/wassim/BVIRAL:/app
+      - ./BVIRAL:/app
     ports:
-      - "3000:3000"
+      - "5000:5000"
     depends_on:
       - dynamodb-local
     networks:
       - my-network  # Same network as dynamodb-local
-
-
   opensearch-node1:
     image: opensearchproject/opensearch:latest
     container_name: opensearch-node1
@@ -91,6 +92,8 @@ services:
 volumes:
   opensearch-data1:
   opensearch-data2:
+
+
 
 networks:
   opensearch-net:

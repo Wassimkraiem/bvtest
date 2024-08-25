@@ -1,5 +1,7 @@
 from venv import logger
+
 import boto3
+
 from botocore.exceptions import ClientError
 from botocore.config import Config
 class DynamoDBVideosTable:
@@ -17,8 +19,6 @@ class DynamoDBVideosTable:
                 ],
                 AttributeDefinitions=[
                     {"AttributeName": "video_id", "AttributeType": "S"},
-                    {"AttributeName": "videoTitle", "AttributeType": "S"},
-                    {"AttributeName": "description", "AttributeType": "S"},
                     {"AttributeName": "uploadDate", "AttributeType": "S"},
                 ],
                 ProvisionedThroughput={
@@ -102,9 +102,25 @@ def initialize_dynamodb(app):
         aws_secret_access_key='dummySecret', # Dummy credentials
         endpoint_url='http://dynamodb-local:8000',
     )
-    video_table.init(dyn_resource, 'VideoTable')
     try:
         table_description = video_table.create_table('VideoTable')
         print(f"Table description: {table_description}")
     except Exception as e:
         print(f"Error: {e}")
+    video_table.init(dyn_resource, 'VideoTable')
+    # video_table.delete_table()
+    
+def list_dynamodb_tables(app):
+    dynamodb = boto3.client(
+        'dynamodb',
+        region_name="eu-west-2",  # Adjust as necessary
+        aws_access_key_id="dummyKey",  # Replace with your access key
+        aws_secret_access_key="dummySecret",  # Replace with your secret key
+        endpoint_url="http://dynamodb-local:8000"  # Use this for DynamoDB Local
+    )
+
+    try:
+        response = dynamodb.list_tables()
+        print("Tables in DynamoDB:", response['TableNames'])
+    except Exception as e:
+        print(f"Error listing tables: {e}")
